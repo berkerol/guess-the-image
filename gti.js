@@ -1,6 +1,7 @@
-/* global images Image */
+/* global images Image createTextInput createHeaderMenuRow createModalButton createModal keyDownHandler keyUpHandler */
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
+const containerElements = document.getElementsByClassName('container');
 
 const fillStyle = '#ddd';
 const strokeStyle = '#000';
@@ -9,10 +10,10 @@ const defaultRows = 10;
 const defaultCols = 15;
 const defaultLimit = 20;
 const defaultDel = true;
-let rows = defaultRows;
-let cols = defaultCols;
-let limit = defaultLimit;
-let del = defaultDel;
+let rows;
+let cols;
+let limit;
+let del;
 
 let image;
 let imageName;
@@ -22,20 +23,36 @@ let scaledHeight;
 let startX;
 let startY;
 let remaining;
-let locked;
+
+window.locked = true;
 
 const panels = [];
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight - 38;
+const modalElements = [[['Rows', 'rows', 3, 99, 'number'], ['Columns', 'cols', 3, 99, 'number']], [['Limit', 'limit', 0, 9999, 'number'], ['<u>D</u>elete photo after round', 'del', 'd', 'check']]];
+const headerElements = ['h5', 'my-auto', 'Remaining: <span id="remaining"></span>'];
+const buttonElements = [['success', 'if(!locked)window.guess()', 'g', 'search', '<u>G</u>uess'], ['primary', 'if(!locked)random()', 'r', 'random', '<u>R</u>andom'], ['danger', 'if(!locked)giveUp()', 'u', 'times', 'Give <u>U</u>p'], ['info', 'restart()', 'e', 'sync', 'R<u>e</u>start'], ['info', '', 's', 'cog', '<u>S</u>ettings']];
+const header = createHeaderMenuRow('d-flex justify-content-center', 'btn-group', headerElements, buttonElements);
+const buttonGroup = header.children[1];
+createModalButton(buttonGroup, 4);
+const textInputDiv = document.createElement('div');
+textInputDiv.className = 'form-group my-auto ml-4 mr-4';
+textInputDiv.appendChild(createTextInput('guess'));
+header.insertBefore(textInputDiv, buttonGroup);
+document.getElementsByClassName('container')[0].appendChild(header);
+createModal(modalElements);
 resetInputs();
 restart();
+resizeHandler();
 document.addEventListener('keydown', keyDownHandler);
 document.addEventListener('keyup', keyUpHandler);
 document.addEventListener('mousedown', mouseDownHandler);
 window.addEventListener('resize', resizeHandler);
 
 function resetInputs () {
+  rows = defaultRows;
+  cols = defaultCols;
+  limit = defaultLimit;
+  del = defaultDel;
   document.getElementById('rows').value = rows;
   document.getElementById('cols').value = cols;
   document.getElementById('limit').value = limit;
@@ -49,23 +66,23 @@ window.save = function () {
   del = document.getElementById('del').checked;
 };
 
-function guess () {
+window.guess = function () {
   const input = document.getElementById('guess');
   const guess = input.value.toLowerCase();
   input.value = '';
   if (guess === imageName.toLowerCase()) {
-    exit('Congratulations, your guess is correct.');
+    end('Congratulations, your guess is correct.');
   } else {
     window.alert('Your guess is not correct, try again.');
   }
-}
+};
 
 window.random = function () {
   open(Math.floor(Math.random() * panels.length));
 };
 
 window.giveUp = function () {
-  exit(`The image was ${imageName}.`);
+  end(`The image was ${imageName}.`);
 };
 
 function restart () {
@@ -89,7 +106,7 @@ function restart () {
     remaining = limit;
   }
   document.getElementById('remaining').innerHTML = remaining;
-  locked = false;
+  window.locked = false;
 }
 
 function updatePanels () {
@@ -132,39 +149,22 @@ function open (i) {
   panels.splice(i, 1);
   document.getElementById('remaining').innerHTML = --remaining;
   if (remaining === 0) {
-    exit(`You reached the limit, the image was ${imageName}.`);
+    end(`You reached the limit, the image was ${imageName}.`);
   } else if (panels.length === 0) {
-    exit(`Everything is visible, the image was ${imageName}.`);
+    end(`Everything is visible, the image was ${imageName}.`);
   } else {
     draw();
   }
 }
 
-function exit (message) {
+function end (message) {
   panels.length = 0;
   draw();
   if (del) {
     images.splice(imageIndex, 1);
   }
-  locked = true;
+  window.locked = true;
   window.alert(message + '\nRestart the game!');
-}
-
-function keyDownHandler (e) {
-  if (e.keyCode === 13 && !locked) {
-    e.preventDefault();
-    guess();
-  }
-}
-
-function keyUpHandler (e) {
-  if (e.keyCode === 82) {
-    rows = defaultRows;
-    cols = defaultCols;
-    limit = defaultLimit;
-    del = defaultDel;
-    resetInputs();
-  }
 }
 
 function mouseDownHandler (e) {
@@ -181,6 +181,6 @@ function mouseDownHandler (e) {
 
 function resizeHandler () {
   canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight - 38;
+  canvas.height = window.innerHeight - (containerElements.length === 0 ? 0 : containerElements[0].clientHeight);
   updatePanels();
 }
