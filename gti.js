@@ -35,7 +35,7 @@ const header = createHeaderMenuRow('d-flex justify-content-center', 'btn-group',
 const buttonGroup = header.children[1];
 createModalButton(buttonGroup, 4);
 const textInputDiv = document.createElement('div');
-textInputDiv.className = 'form-group my-auto ml-4 mr-4';
+textInputDiv.className = 'my-auto ms-4 me-4';
 textInputDiv.appendChild(createTextInput('guess'));
 header.insertBefore(textInputDiv, buttonGroup);
 document.getElementsByClassName('container')[0].appendChild(header);
