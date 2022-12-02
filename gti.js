@@ -1,4 +1,4 @@
-/* global images Image createTextInput createHeaderMenuRow createModalButton createModal keyDownHandler keyUpHandler */
+/* global images Image createTextInput createButtonGroup createElement createRow createModalButton createModal keyDownHandler keyUpHandler */
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const containerElements = document.getElementsByClassName('container');
@@ -29,9 +29,9 @@ window.locked = true;
 const panels = [];
 
 const modalElements = [[['Rows', 'rows', 3, 99, 'number'], ['Columns', 'cols', 3, 99, 'number']], [['Limit', 'limit', 0, 9999, 'number'], ['<u>D</u>elete photo after round', 'del', 'd', 'check']]];
-const headerElements = ['h5', 'my-auto', 'Remaining: <span id="remaining"></span>'];
+const headerElements = ['h5', 'Remaining: <span id="remaining"></span>', 'my-auto'];
 const buttonElements = [['success', 'if(!locked)window.guess()', 'g', 'search', '<u>G</u>uess'], ['primary', 'if(!locked)random()', 'r', 'random', '<u>R</u>andom'], ['danger', 'if(!locked)giveUp()', 'u', 'times', 'Give <u>U</u>p'], ['info', 'restart()', 'e', 'sync', 'R<u>e</u>start'], ['info', '', 's', 'cog', '<u>S</u>ettings']];
-const header = createHeaderMenuRow('d-flex justify-content-center', 'btn-group', headerElements, buttonElements);
+const header = createRow('d-flex justify-content-center', [createElement(...headerElements), createButtonGroup('btn-group', buttonElements)]);
 const buttonGroup = header.children[1];
 createModalButton(buttonGroup, 4);
 const textInputDiv = document.createElement('div');
