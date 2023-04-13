@@ -1,4 +1,4 @@
-/* global images Image createTextInput createButtonGroup createElement createRow createModalButton createModal keyDownHandler keyUpHandler */
+/* global images Image createTextInput createButtonGroup createDatalist deleteOptionFromDatalist createElement createRow createModalButton createModal keyDownHandler keyUpHandler */
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const containerElements = document.getElementsByClassName('container');
@@ -40,6 +40,11 @@ textInputDiv.appendChild(createTextInput('guess'));
 header.insertBefore(textInputDiv, buttonGroup);
 document.getElementsByClassName('container')[0].appendChild(header);
 createModal(modalElements);
+const imageNames = [];
+for (const image of images) {
+  imageNames.push(image.substring(7, image.length - 4));
+}
+document.getElementsByClassName('container')[0].appendChild(createDatalist('guess', 'guessDatalist', imageNames));
 resetInputs();
 restart();
 resizeHandler();
@@ -162,6 +167,7 @@ function end (message) {
   draw();
   if (del) {
     images.splice(imageIndex, 1);
+    deleteOptionFromDatalist('guessDatalist', imageName);
   }
   window.locked = true;
   window.alert(message + '\nRestart the game!');
